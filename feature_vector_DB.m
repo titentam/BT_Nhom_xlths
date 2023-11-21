@@ -1,6 +1,8 @@
 function feature_vector_db = feature_vector_DB(fileName)
 
-    [x, fs] = audioread(fileName);
+    [x, fs] = STE(fileName);
+    
+    x= x/ max(abs(x));
 
     % a. Chia vùng ch?a nguyên âm thành 3 ?o?n có ?? dài b?ng nhau
     len_x = length(x);

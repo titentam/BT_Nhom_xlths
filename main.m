@@ -8,27 +8,41 @@ subDirs = subDirs(3:end);  % B? qua '.' và '..'
 
 N_FFT = 512;
 
-result = zeros(N_FFT, 1);
+
 % Duy?t qua t?ng th? m?c và ??c file 'a.wav'
-for i = 1:length(subDirs)
-    currentDir = fullfile(dataTrainDir, subDirs(i).name);
-    audioFile = fullfile(currentDir, 'u.wav');
+filename = ["a.wav"; "e.wav";"i.wav";"o.wav";"u.wav"];
+
+figure;
+for j = 1:5
+    result = zeros(N_FFT, 1);
     
-    % Ki?m tra xem file 'a.wav' có t?n t?i không
-    if exist(audioFile, 'file')
-        fprintf('Thông tin file: %s\n', audioFile);
-        y = feature_vector_DB(audioFile);
-        result = result + y;
-    else
-        fprintf('File %s không t?n t?i.\n', audioFile);
+    for i = 1:length(subDirs)
+      
+        currentDir = fullfile(dataTrainDir, subDirs(i).name);
+        audioFile = fullfile(currentDir, filename(j));
+
+        % Ki?m tra xem file 'a.wav' có t?n t?i không
+        if exist(audioFile, 'file')
+            fprintf('Thông tin file: %s\n', audioFile);
+
+                y = feature_vector_DB(audioFile);
+                result = result + y;
+
+%             y = feature_vector_DB(audioFile);
+%             subplot(5,5,i);
+%             plot(y(1:floor(length(y)/2)));
+        else
+            fprintf('File %s không t?n t?i.\n', audioFile);
+        end 
+        
+        aaa = result / length(subDirs);
+
+        N = length(aaa);  
+        subplot(5,1,j);
+        plot(aaa(1:floor(N/2)));
+        title('Feature vector spectrum (dB) ' + filename(j) );
+        xlabel('Frequency');
+        ylabel('Magnitude (dB)');
+
     end
 end
-
-aaa = result / length(subDirs);
-
-N = length(aaa);
-figure;
-plot(aaa(1:floor(N/2)));
-title('Feature vector spectrum (dB)');
-xlabel('Frequency');
-ylabel('Magnitude (dB)');
