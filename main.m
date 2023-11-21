@@ -6,12 +6,13 @@ subDirs = dir(dataTrainDir);
 subDirs = subDirs([subDirs.isdir]);  % L?c ch? l?y các th? m?c
 subDirs = subDirs(3:end);  % B? qua '.' và '..'
 
-N_FFT = 512;
+N_FFT = 2048;
 
 
 % Duy?t qua t?ng th? m?c và ??c file 'a.wav'
 filename = ["a.wav"; "e.wav";"i.wav";"o.wav";"u.wav"];
 
+dataDB = []; % export file excel
 figure;
 for j = 1:5
     result = zeros(N_FFT, 1);
@@ -25,8 +26,8 @@ for j = 1:5
         if exist(audioFile, 'file')
             fprintf('Thông tin file: %s\n', audioFile);
 
-                y = feature_vector_DB(audioFile);
-                result = result + y;
+            y = feature_vector_DB(audioFile,N_FFT);
+            result = result + y;
 
 %             y = feature_vector_DB(audioFile);
 %             subplot(5,5,i);
@@ -35,14 +36,19 @@ for j = 1:5
             fprintf('File %s không t?n t?i.\n', audioFile);
         end 
         
-        aaa = result / length(subDirs);
-
-        N = length(aaa);  
-        subplot(5,1,j);
-        plot(aaa(1:floor(N/2)));
-        title('Feature vector spectrum (dB) ' + filename(j) );
-        xlabel('Frequency');
-        ylabel('Magnitude (dB)');
-
     end
+    
+    trungbinh = result / length(subDirs);
+    N = length(trungbinh);  
+    
+    dataDB = [dataDB,trungbinh(1:floor(N/2))];
+
+    
+    subplot(5,1,j);
+    plot(trungbinh(1:floor(N/2)));
+    title('Feature vector spectrum (dB) ' + filename(j) );
+    xlabel('Frequency');
+    ylabel('Magnitude (dB)');
 end
+
+dlmwrite('data.csv', dataDB, 'delimiter', ',');  % Ghi ma tr?n vector3 vào file CSV v?i d?u ph?y làm d?u phân cách

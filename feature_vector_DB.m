@@ -1,4 +1,5 @@
-function feature_vector_db = feature_vector_DB(fileName)
+
+function feature_vector_db = feature_vector_DB(fileName,N_FFT)
 
     [x, fs] = STE(fileName);
     
@@ -26,9 +27,6 @@ function feature_vector_db = feature_vector_DB(fileName)
 
     % S? l??ng frame M
     num_frames = size(frames, 2);
-
-    % b. Trích xu?t vector FFT c?a M khung tín hi?u v?i s? chi?u là N_FFT
-    N_FFT = 512; % Ch?n s? chi?u FFT
 
     % Kh?i t?o vector ??c tr?ng
     feature_vector = zeros(N_FFT, 1);
