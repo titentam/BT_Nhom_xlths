@@ -6,7 +6,7 @@ subDirs = dir(dataTrainDir);
 subDirs = subDirs([subDirs.isdir]);  % L?c ch? l?y các th? m?c
 subDirs = subDirs(3:end);  % B? qua '.' và '..'
 
-N_FFT = 2048;
+N_FFT = 512;
 
 
 % Duy?t qua t?ng th? m?c và ??c file 'a.wav'

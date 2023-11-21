@@ -8,7 +8,7 @@ function [voiceSound, fs] = STE(fileName)
     frameLength = round(frameDuration * fs); % S? m?u trong m?i khung
     
     % Tính toán n?ng l??ng c?a m?i khung âm thanh
-    energy = sum(reshape(sound(1:frameLength * floor(length(sound) / frameLength)), frameLength, []).^2);
+    energy = sum(reshape(abs(sound(1:frameLength * floor(length(sound) / frameLength)), frameLength, []).^2);
 
     % Xác ??nh ng??ng n?ng l??ng
     energyThreshold = mean(energy);
