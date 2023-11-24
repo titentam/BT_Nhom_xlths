@@ -18,18 +18,19 @@ dataDB = csvread('data.csv'); % import file excel
 
 total = 0;
 count = 0;
+fprintf('Thông tin file: \n');
 for i = 1:length(subDirs)
     currentDir = fullfile(dataTrainDir, subDirs(i).name);
-    
-    
+   
     for j = 1:5
         audioFile = fullfile(currentDir, filename(j));
         % Ki?m tra xem file 'a.wav' có t?n t?i không
         if exist(audioFile, 'file')
-            fprintf('Thông tin file: %s\n', audioFile);
+            fprintf('%s', audioFile);
             
             y = feature_vector_DB(audioFile,N_FFT);
-            y = y(1:floor(length(y)/2)); % 1ay 1 nua thoi
+            %y = Cal_MFCC(audioFile,N_FFT);
+            %y = y(1:floor(length(y)/2)); % 1ay 1 nua thoi
             
             minDistance = 1000000000;
             position = 0;
@@ -42,8 +43,11 @@ for i = 1:length(subDirs)
                 
             end
             
-            if(j==position)   
+            if(j==position)
                 count = count+1;
+                fprintf(': True\n');
+            else
+                fprintf(': False\n');    
             end
                 
             total = total+1;
