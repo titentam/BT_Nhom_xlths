@@ -5,7 +5,7 @@ function feature_vector_db = feature_vector_DB(fileName, N_FFT)
     end
 
     % Load the audio file and get the signal and sampling rate
-    [x, fs] = removeSilence(fileName);
+    [x, fs] = STE(fileName);
     x = x / max(abs(x));
 
     % Define constants

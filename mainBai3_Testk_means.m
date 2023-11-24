@@ -1,3 +1,10 @@
+
+
+
+% Duy?t qua t?ng th? m?c và ??c file 'a.wav'
+filename = ["a.wav"; "e.wav";"i.wav";"o.wav";"u.wav"];
+
+for kk =2:5
 % Th? m?c ch?a d? li?u
 dataTrainDir = 'DataTrain';
 
@@ -6,16 +13,11 @@ subDirs = dir(dataTrainDir);
 subDirs = subDirs([subDirs.isdir]);  % L?c ch? l?y các th? m?c
 subDirs = subDirs(3:end);  % B? qua '.' và '..'
 
-N_FFT = 13;
-
-kk =2;
-% Duy?t qua t?ng th? m?c và ??c file 'a.wav'
-filename = ["a.wav"; "e.wav";"i.wav";"o.wav";"u.wav"];
-
+N_MFCC = 13;
 dataDB = []; % export file excel
-figure;
+
 for j = 1:5
-    result = zeros(N_FFT, length(subDirs));
+    result = zeros(N_MFCC, length(subDirs));
     
     for i = 1:length(subDirs)
       
@@ -24,9 +26,9 @@ for j = 1:5
 
         % Ki?m tra xem file 'a.wav' có t?n t?i không
         if exist(audioFile, 'file')
-            fprintf('Thông tin file: %s\n', audioFile);
+            %fprintf('Thông tin file: %s\n', audioFile);
             
-            y = Cal_MFCC(audioFile,N_FFT);
+            y = Cal_MFCC(audioFile,N_MFCC);
             result(:,i) = y;
 
         else
@@ -36,10 +38,16 @@ for j = 1:5
     end
     
     % thay vi lay trung binh thi dung kmeans
-    
-    % ch?n các ?i?m trung tâm ban ??u
     result = transpose(result);
-    [idx, x] = kmeans(result, kk);
+    
+    nums = size(result,1);
+    shift = floor(nums/(kk+1));
+    fixedCentroids =zeros(kk,N_MFCC);
+    for i = 1:kk
+        fixedCentroids(i,:) = result(i*shift,:);
+    end
+    
+    [x,~,~,~] = v_kmeans(result,kk,fixedCentroids,5000);
     
     
     %dataDB = [dataDB,trungbinh(1:floor(N/2))];
@@ -75,9 +83,9 @@ for i = 1:length(subDirs)
         audioFile = fullfile(currentDir, filename(j));
         % Ki?m tra xem file 'a.wav' có t?n t?i không
         if exist(audioFile, 'file')
-            fprintf('Thông tin file: %s\n', audioFile);
+            %fprintf('Thông tin file: %s\n', audioFile);
             
-            y = Cal_MFCC(audioFile,N_FFT);
+            y = Cal_MFCC(audioFile,N_MFCC);
             %y = y(1:floor(length(y)/2)); % 1ay 1 nua thoi
             
             minDistance = 1000000000;
@@ -110,9 +118,13 @@ for i = 1:length(subDirs)
     
 end
 
-disp(confusion);
+%disp(confusion);
+
+
 
 fprintf('Ty le: %f\n', count/total);
+
+end
 
 
 
