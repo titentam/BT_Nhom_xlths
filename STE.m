@@ -13,8 +13,8 @@ function [voiceSound, fs] = STE(fileName)
 
     % Xác ??nh ng??ng n?ng l??ng
    
-    %energyThreshold = mean(energy)*0.3; %bai 3
-    energyThreshold = mean(energy); %bai 2
+    energyThreshold = mean(energy)*0.3; %bai 3
+%     energyThreshold = mean(energy); %bai 2
 
     % Xác ??nh các kho?ng l?ng và nguyên âm d?a trên ng??ng n?ng l??ng
     isVoiced = energy > energyThreshold;

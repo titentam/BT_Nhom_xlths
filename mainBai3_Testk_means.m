@@ -1,18 +1,16 @@
 
-
-% Duy?t qua t?ng th? m?c và ??c file 'a.wav'
 filename = ["a.wav"; "e.wav";"i.wav";"o.wav";"u.wav"];
 
 rates = cell(1, 5);
 rates{1,1} = "Rate";
-results = cell(6, 6);
-for i = 1:size(results, 1)-1
+
+for kk =2:5
+    results = cell(6, 6);
+    for i = 1:size(results, 1)-1
         for j = 2:size(results, 2) 
             results{i, j} = 0; 
         end
-end
-
-for kk =2:5
+    end
     % Th? m?c ch?a d? li?u
     dataTrainDir = 'DataTrain';
 
@@ -64,7 +62,6 @@ for kk =2:5
         %dataDB = [dataDB,trungbinh(1:floor(N/2))];
         dataDB = [dataDB,transpose(x)];
 
-
     end
 
 
@@ -112,7 +109,7 @@ for kk =2:5
                     end
 
                 end
-
+                results{j,position+1} = results{j,position+1} + 1;
                 confusion(position, j) = confusion(position, j) + 1;
 
                 if(j==position)   
@@ -128,17 +125,43 @@ for kk =2:5
         end
 
     end
-
     %disp(confusion);
-
-
-
-    fprintf('%f\n', count/total);
-
+    rates{1,kk} = count/total;
+%     fprintf('%f\n', count/total);
+    results{1,1} = 'am_a';
+    results{2,1} = 'am_e';
+    results{3,1} = 'am_i';
+    results{4,1} = 'am_o';
+    results{5,1} = 'am_u';
+    results{6,1} = 'ty_le_chung';
+    results{6,2} = count/total;
+    columnNames = {'nhan_dung_vs_nhan_dinh','am_a', 'am_e', 'am_i', 'am_o', 'am_u'};
+    resultTable = cell2table(results, 'VariableNames', columnNames);
+    excelFileName = sprintf('ConfusionMatrix_k%d.xlsx',kk); 
+    writetable(resultTable, excelFileName);
+    
 end
+columnNames = {'total','k_2', 'k_3', 'k_4', 'k_5'};
+rateTable = cell2table(rates, 'VariableNames', columnNames);
+excelFileName = sprintf('RatesBai3.xlsx');
+writetable(rateTable, excelFileName);
 
+excelFileName = sprintf('ConfusionMatrix_k3.xlsx'); 
+excel = actxserver('Excel.Application');
+excel.Workbooks.Open(fullfile(pwd, excelFileName));
+excel.Visible = true;
+sheet = excel.ActiveSheet;
 
+% In ??m ô F6 (5,6)
+highlightCell = sheet.Range('F6'); 
+highlightCell.Font.Bold = true;
 
+% In ??m ô C3 (2,3)
+highlightCell = sheet.Range('E5'); 
+highlightCell.Font.Italic = true;
 
-
+% L?u l?i và ?óng file Excel
+% excel.ActiveWorkbook.Save;
+% excel.ActiveWorkbook.Close;
+% excel.Quit;
 
