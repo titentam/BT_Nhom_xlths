@@ -1,4 +1,4 @@
-function feature_vector_db = feature_vector_DB(fileName)
+function feature_vector_db = feature_vector_DB(fileName, N_FFT)
 
     [x, fs] = STE(fileName);
     
@@ -17,7 +17,7 @@ function feature_vector_db = feature_vector_DB(fileName)
 
 
     % ?? dài c?a m?i frame (20ms)
-    frame_length = 0.02 * fs;
+    frame_length = 0.025 * fs;
 
     % B??c nh?y gi?a các frame (10ms)
     hop_size = 0.01 * fs;
@@ -28,7 +28,7 @@ function feature_vector_db = feature_vector_DB(fileName)
     num_frames = size(frames, 2);
 
     % b. Trích xu?t vector FFT c?a M khung tín hi?u v?i s? chi?u là N_FFT
-    N_FFT = 512; % Ch?n s? chi?u FFT
+%     N_FFT = 512; % Ch?n s? chi?u FFT
 
     % Kh?i t?o vector ??c tr?ng
     feature_vector = zeros(N_FFT, 1);
@@ -38,7 +38,7 @@ function feature_vector_db = feature_vector_DB(fileName)
         fft_result = fft(frames(:, i), N_FFT);
 
         % C?ng d?n vào vector ??c tr?ng
-        feature_vector = feature_vector + fft_result;
+        feature_vector = feature_vector + abs(fft_result);
     end
 
     % Tính trung bình c?ng
