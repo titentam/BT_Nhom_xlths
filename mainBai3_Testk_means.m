@@ -1,9 +1,14 @@
 
 
-
-% Duy?t qua t?ng th? m?c và ??c file 'a.wav'
 filename = ["a.wav"; "e.wav";"i.wav";"o.wav";"u.wav"];
-
+rates = cell(1, 5);
+rates{1,1} = "Rate";
+results = cell(6, 6);
+for i = 1:size(results, 1)-1
+        for j = 2:size(results, 2) 
+            results{i, j} = 0; 
+        end
+end
 for kk =2:5
 % Th? m?c ch?a d? li?u
 dataTrainDir = 'DataTrain';
@@ -107,7 +112,10 @@ for i = 1:length(subDirs)
             if(j==position)   
                 count = count+1;
             end
-                
+            if kk == 3
+                results{j,position+1} = results{j,position+1} + 1;
+            end
+            
             total = total+1;
             
         else
@@ -121,10 +129,42 @@ end
 %disp(confusion);
 
 
-
+rates{1,kk} = count/total;
 fprintf('Ty le: %f\n', count/total);
 
 end
+columnNames = {'total','k_2', 'k_3', 'k_4', 'k_5'};
+rateTable = cell2table(rates, 'VariableNames', columnNames);
+excelFileName = sprintf('Rates.xlsx');
+writetable(rateTable, excelFileName);
 
+results{1,1} = 'am_a';
+results{2,1} = 'am_e';
+results{3,1} = 'am_i';
+results{4,1} = 'am_o';
+results{5,1} = 'am_u';
+results{6,1} = 'ty_le_chung';
+results{6,2} = rates{1,3};
+columnNames = {'nhan_dung_vs_nhan_dinh','am_a', 'am_e', 'am_i', 'am_o', 'am_u'};
+resultTable = cell2table(results, 'VariableNames', columnNames);
+excelFileName = sprintf('Results.xlsx'); 
+writetable(resultTable, excelFileName);
 
+excel = actxserver('Excel.Application');
+excel.Workbooks.Open(fullfile(pwd, excelFileName));
+excel.Visible = true;
+sheet = excel.ActiveSheet;
 
+% In ??m ô F6 (5,6)
+highlightCell = sheet.Range('F6'); 
+highlightCell.Font.Bold = true;
+
+% In ??m ô C3 (2,3)
+highlightCell = sheet.Range('C3'); 
+highlightCell.Font.Italic = true;
+
+% L?u l?i và ?óng file Excel
+excel.ActiveWorkbook.Save;
+% excel.ActiveWorkbook.Close;
+% excel.Quit;
+% excel.Visible = false;
