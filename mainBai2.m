@@ -10,7 +10,7 @@ N_FFT = 512;
 
 
 % Duy?t qua t?ng th? m?c và ??c file 'a.wav'
-filename = ["a"; "e";"i";"o";"u"];
+
 colors = [...
     0 0.4470 0.7410;  % Màu xanh d??ng
     0.8500 0.3250 0.0980;  % Màu cam
@@ -19,22 +19,27 @@ colors = [...
     0.4660 0.6740 0.1880   % Màu xanh lá cây
 ];
 
+filename = ["a"; "e";"i";"o";"u"];
+
+frame_length = 21;
+frame_shift = 18;
+   
 dataDB = []; % export file excel
 figure;
 hold on;
 for j = 1:5
     result = zeros(N_FFT, 1);
-    
+
     for i = 1:length(subDirs)
-      
+
         currentDir = fullfile(dataTrainDir, subDirs(i).name);
         audioFile = fullfile(currentDir, filename(j)+".wav");
 
         % Ki?m tra xem file 'a.wav' có t?n t?i không
         if exist(audioFile, 'file')
-            fprintf('Thông tin file: %s\n', audioFile);
+            %fprintf('Thông tin file: %s\n', audioFile);
 
-            y = feature_vector_DB(audioFile,N_FFT);
+            y = feature_vector_DB(audioFile,N_FFT,frame_length,frame_shift);
             %y = Cal_MFCC(audioFile,N_FFT);
             result = result + y;
 
@@ -44,17 +49,17 @@ for j = 1:5
         else
             fprintf('File %s không t?n t?i.\n', audioFile);
         end 
-        
+
     end
-    
+
     trungbinh = result / length(subDirs);
     N = length(trungbinh);  
-    
+
     %dataDB = [dataDB,trungbinh(1:floor(N/2))];
     dataDB = [dataDB,trungbinh];
-    
+
     plot(trungbinh(1:floor(N/2)), 'Color', colors(j, :));
-    
+
 end
 
 legend(filename(1:5), 'Location', 'eastoutside');
@@ -62,7 +67,7 @@ title('Feature vector spectrum (dB) ');
 xlabel('Frequency');
 ylabel('Magnitude (dB)');
 
-dlmwrite('data.csv', dataDB, 'delimiter', ',');  % Ghi ma tr?n vector3 vào file CSV v?i d?u ph?y làm d?u phân cách
+dlmwrite('data.csv', dataDB, 'delimiter', ',');
 
 % Th? m?c ch?a d? li?u
 dataTrainDir = 'DataTest';
@@ -72,34 +77,31 @@ subDirs = dir(dataTrainDir);
 subDirs = subDirs([subDirs.isdir]);  % L?c ch? l?y các th? m?c
 subDirs = subDirs(3:end);  % B? qua '.' và '..'
 
-N_FFT = 512;
-
 % Duy?t qua t?ng th? m?c và ??c file 'a.wav'
-filename = ["a.wav"; "e.wav";"i.wav";"o.wav";"u.wav"];
 
 dataDB = csvread('data.csv'); % Import file excel
 
 total = 0;
 count = 0;
-fprintf('Thông tin file: \n');
+%fprintf('Thông tin file: \n');
 
 result = cell(22, 6); % S? d?ng cell array ?? l?u k?t qu?
 for i = 1:length(subDirs)
     currentDir = fullfile(dataTrainDir, subDirs(i).name);
     result{i+1, 1} = subDirs(i).name;
-   
+
     for j = 1:5
-        audioFile = fullfile(currentDir, filename(j));
+        audioFile = fullfile(currentDir, filename(j)+".wav");
         result{1, j+1} = filename(j); % Assign filename instead of audioFile
-        
+
         % Ki?m tra xem file 'a.wav' có t?n t?i không
         if exist(audioFile, 'file')
-            fprintf('%s', audioFile);
-            
-            y = feature_vector_DB(audioFile,N_FFT);
+            %fprintf('%s', audioFile);
+
+            y = feature_vector_DB(audioFile,N_FFT,frame_length,frame_shift);
             %y = Cal_MFCC(audioFile,N_FFT);
             %y = y(1:floor(length(y)/2)); % L?y 1 n?a thôi
-            
+
             minDistance = 1000000000;
             position = 0;
             for k = 1: 5
@@ -109,16 +111,16 @@ for i = 1:length(subDirs)
                     position = k;
                 end
             end
-            
+
             if j == position
                 count = count + 1;
-                fprintf(': True\n');
+                %fprintf(': True\n');
                 result{i+1, j+1} = 'True'; % Use char 'True' instead of "True"
             else
-                fprintf(': False\n');    
+                %fprintf(': False\n');    
                 result{i+1, j+1} = 'False'; % Use char 'False' instead of "False"
             end
-                
+
             total = total + 1;
         else
             fprintf('File %s không t?n t?i.\n', audioFile);
@@ -126,4 +128,4 @@ for i = 1:length(subDirs)
     end
 end
 
-fprintf('T? l?: %f\n', count/total);
+fprintf('%f\n', count/total);

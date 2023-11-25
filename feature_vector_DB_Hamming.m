@@ -25,9 +25,12 @@ function feature_vector_db = feature_vector_DB(fileName, N_FFT,frame_length,fram
     
     num_frames = size(frames, 2);
     feature_vector = zeros(N_FFT, 1);
+    
+    window = hamming(frame_length);
     for i = 1:num_frames
-
-        fft_result = fft(frames(:, i), N_FFT);
+        frame = frames(:, i);
+        frame_windowed = frame .* window;
+        fft_result = fft(frame_windowed, N_FFT);
 
         feature_vector = feature_vector + abs(fft_result);
     end

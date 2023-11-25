@@ -28,7 +28,7 @@ function averageMFCC = Cal_MFCC2(fileName, N_MFCC, k)
     end
     
     % Cluster MFCC using K-means
-    [x, ~, idx, ~] = v_kmeans(mfcc_result, k,'f',1000);
+    [x, ~, idx, ~] = v_kmeans(mfcc_result, k,fixedCentroids,5000);
 
     % Compute average MFCC for each cluster
     clusterCentroids = zeros(k, N_MFCC);

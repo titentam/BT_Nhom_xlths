@@ -7,6 +7,8 @@ subDirs = subDirs([subDirs.isdir]);  % L?c ch? l?y các th? m?c
 subDirs = subDirs(3:end);  % B? qua '.' và '..'
 
 N_FFT = 13;
+frame_length = 22;
+frame_shift = 12;
 
 
 % Duy?t qua t?ng th? m?c và ??c file 'a.wav'
@@ -33,7 +35,7 @@ for j = 1:5
         if exist(audioFile, 'file')
             fprintf('Thông tin file: %s\n', audioFile);
             
-            y = Cal_MFCC(audioFile,N_FFT);
+            y = Cal_MFCC(audioFile,N_FFT,frame_length,frame_shift);
             result = result + y;
 
         else
@@ -72,6 +74,12 @@ dataDB = csvread('data.csv'); % import file excel
 total = 0;
 count = 0;
 confusion = zeros(5, 5);
+tables = cell(22,6);
+for i = 1:size(tables, 1)-1 
+        for j = 2:size(tables, 2) 
+            tables{i, j} = 0; 
+        end
+end
 for i = 1:length(subDirs)
     currentDir = fullfile(dataTrainDir, subDirs(i).name);
     
@@ -82,7 +90,7 @@ for i = 1:length(subDirs)
         if exist(audioFile, 'file')
             fprintf('Thông tin file: %s\n', audioFile);
             
-            y = Cal_MFCC(audioFile,N_FFT);
+            y = Cal_MFCC(audioFile,N_FFT,frame_length,frame_shift);
             %y = y(1:floor(length(y)/2)); % 1ay 1 nua thoi
             
             minDistance = 1000000000;
@@ -95,7 +103,11 @@ for i = 1:length(subDirs)
                 end
                 
             end
-            
+            if position == j
+                    tables{i,j+1} = 1;
+            end
+            tables{i,1} = subDirs(i).name;
+%             results{j,position+1} = results{j,position+1} + 1;
             confusion(position, j) = confusion(position, j) + 1;
             
             if(j==position)   
@@ -111,10 +123,27 @@ for i = 1:length(subDirs)
     end
     
 end
+% results{1,1} = 'am_a';
+% results{2,1} = 'am_e';
+% results{3,1} = 'am_i';
+% results{4,1} = 'am_o';
+% results{5,1} = 'am_u';
+% results{6,1} = 'rate';
+% results{6,2} = count/total;
+tables{22,1} = 'rate';
+tables{22,2} = count/total;
+columnNames = {'ten_file','am_a', 'am_e', 'am_i', 'am_o', 'am_u'};
+% resultTable = cell2table(results, 'VariableNames', columnNames);
+% excelFileName = sprintf('Results.xlsx');
+% writetable(resultTable, excelFileName);
 
+tableTable = cell2table(tables, 'VariableNames', columnNames);
+excelFileNameTable = sprintf('Ketqua_nhandangBai3.xlsx');
+writetable(tableTable, excelFileNameTable);
+    
 disp(confusion);
-
 fprintf('Ty le: %f\n', count/total);
+
 
 
 

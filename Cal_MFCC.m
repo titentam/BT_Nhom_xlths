@@ -1,4 +1,4 @@
-function averageMFCC = Cal_MFCC(fileName, N_MFCC)
+function averageMFCC = Cal_MFCC(fileName, N_MFCC,frame_length,frame_shift)
     % ??c file âm thanh
     [x, fs] = STE(fileName);
     x = x / max(abs(x));
@@ -9,18 +9,17 @@ function averageMFCC = Cal_MFCC(fileName, N_MFCC)
     endIndex = 2 * segmentLength;
     audio = x(startIndex:endIndex);
 
-    FRAME_DURATION = 0.02;  % in seconds
-    HOP_DURATION = 0.01;    % in seconds
-
     % Extract frames
-    frame_length = round(FRAME_DURATION * fs);
-    hop_size = round(HOP_DURATION * fs);
+    frame_overlap = (frame_length-frame_shift) * fs*0.001;
+    frame_length = frame_length * fs*0.001;
     
-    frames = buffer(audio, frame_length, frame_length - hop_size, 'nodelay');
+    frames = buffer(audio, frame_length, frame_overlap, 'nodelay');
     
     num_frames = size(frames, 2);
+    
     mfcc_result = zeros(N_MFCC,1);
     for i = 1:num_frames
+        
        frameTmp = frames(:,i);
        tmp = melcepst(frameTmp, fs, 'M', N_MFCC);
        mfcc_result = mfcc_result+ transpose(tmp);

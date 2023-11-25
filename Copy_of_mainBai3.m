@@ -1,19 +1,16 @@
 
-
-% Duy?t qua t?ng th? m?c và ??c file 'a.wav'
 filename = ["a.wav"; "e.wav";"i.wav";"o.wav";"u.wav"];
+colors = [...
+    0 0.4470 0.7410;  % Màu xanh d??ng
+    0.8500 0.3250 0.0980;  % Màu cam
+    0.9290 0.6940 0.1250;  % Màu vàng
+    0.4940 0.1840 0.5560;  % Màu tím
+    0.4660 0.6740 0.1880   % Màu xanh lá cây
+];
+dataDB = []; % export file excel
 
-rates = cell(1, 5);
-rates{1,1} = "Rate";
-results = cell(6, 6);
-for i = 1:size(results, 1)-1
-        for j = 2:size(results, 2) 
-            results{i, j} = 0; 
-        end
-end
-
-for kk =2:5
-    % Th? m?c ch?a d? li?u
+for radio = 0.1:0.1:1
+    fprintf('radio: %f ', radio);
     dataTrainDir = 'DataTrain';
 
     % L?y danh sách các th? m?c con c?p 1
@@ -21,14 +18,11 @@ for kk =2:5
     subDirs = subDirs([subDirs.isdir]);  % L?c ch? l?y các th? m?c
     subDirs = subDirs(3:end);  % B? qua '.' và '..'
 
-    N_MFCC = 13;
+    N_FFT = 13;
     frame_length = 22;
-    frame_shift = 14;
-
-    dataDB = []; % export file excel
-
+    frame_shift = 12;
     for j = 1:5
-        result = zeros(N_MFCC, length(subDirs));
+        result = zeros(N_FFT, 1);
 
         for i = 1:length(subDirs)
 
@@ -39,8 +33,8 @@ for kk =2:5
             if exist(audioFile, 'file')
                 %fprintf('Thông tin file: %s\n', audioFile);
 
-                y = Cal_MFCC(audioFile,N_MFCC,frame_length,frame_shift);
-                result(:,i) = y;
+                y = Cal_MFCC(audioFile,N_FFT,frame_length,frame_shift,radio);
+                result = result + y;
 
             else
                 fprintf('File %s không t?n t?i.\n', audioFile);
@@ -48,25 +42,17 @@ for kk =2:5
 
         end
 
-        % thay vi lay trung binh thi dung kmeans
-        result = transpose(result);
-
-        nums = size(result,1);
-        shift = floor(nums/(kk+1));
-        fixedCentroids =zeros(kk,N_MFCC);
-        for i = 1:kk
-            fixedCentroids(i,:) = result(i*shift,:);
-        end
-
-        [x,~,~,~] = v_kmeans(result,kk,fixedCentroids,5000);
-
+        trungbinh = result / length(subDirs);
 
         %dataDB = [dataDB,trungbinh(1:floor(N/2))];
-        dataDB = [dataDB,transpose(x)];
+        dataDB = [dataDB,trungbinh];
 
-
+        plot(trungbinh, 'Color', colors(j, :));
     end
-
+%     legend(filename(1:5), 'Location', 'eastoutside');
+%     title('Feature vector spectrum ');
+%     xlabel('N MFCC');
+%     ylabel('Magnitude');
 
     dlmwrite('data.csv', dataDB, 'delimiter', ',');  % Ghi ma tr?n vector3 vào file CSV v?i d?u ph?y làm d?u phân cách
 
@@ -96,19 +82,16 @@ for kk =2:5
             if exist(audioFile, 'file')
                 %fprintf('Thông tin file: %s\n', audioFile);
 
-                y = Cal_MFCC(audioFile,N_MFCC,frame_length,frame_shift);
+                y = Cal_MFCC(audioFile,N_FFT,frame_length,frame_shift,radio);
                 %y = y(1:floor(length(y)/2)); % 1ay 1 nua thoi
 
                 minDistance = 1000000000;
                 position = 0;
-                for k = 1: 5    
-
-                    for L =1:kk
-                        tmpDistance = euclideanDistance(y,dataDB(:,(k-1)*kk+L));
-                        if(minDistance>=tmpDistance)
-                            minDistance = tmpDistance;
-                            position = k;
-                        end
+                for k = 1: 5
+                    tmpDistance = euclideanDistance(y,dataDB(:,k));
+                    if(minDistance>=tmpDistance)
+                        minDistance = tmpDistance;
+                        position = k;
                     end
 
                 end
@@ -131,14 +114,8 @@ for kk =2:5
 
     %disp(confusion);
 
-
-
-    fprintf('%f\n', count/total);
-
+    fprintf('Ty le: %f\n', count/total);
 end
-
-
-
 
 
 
