@@ -1,25 +1,23 @@
 
-
-% Duy?t qua t?ng th? m?c và ??c file 'a.wav'
 filename = ["a.wav"; "e.wav";"i.wav";"o.wav";"u.wav"];
 
 rates = cell(1, 5);
 rates{1,1} = "Rate";
-results = cell(6, 6);
-for i = 1:size(results, 1)-1
+
+for kk =2:5
+    results = cell(6, 6);
+    for i = 1:size(results, 1)-1
         for j = 2:size(results, 2) 
             results{i, j} = 0; 
         end
-end
-
-for kk =2:5
+    end
     % Th? m?c ch?a d? li?u
-    dataTrainDir = 'DataTrain';
+    dataTrainDir = '../DataTrain';
 
-    % L?y danh sách các th? m?c con c?p 1
+    % L?y danh s?ch c?c th? m?c con c?p 1
     subDirs = dir(dataTrainDir);
-    subDirs = subDirs([subDirs.isdir]);  % L?c ch? l?y các th? m?c
-    subDirs = subDirs(3:end);  % B? qua '.' và '..'
+    subDirs = subDirs([subDirs.isdir]);  % L?c ch? l?y c?c th? m?c
+    subDirs = subDirs(3:end);  % B? qua '.' v? '..'
 
     N_MFCC = 13;
     frame_length = 22;
@@ -35,15 +33,15 @@ for kk =2:5
             currentDir = fullfile(dataTrainDir, subDirs(i).name);
             audioFile = fullfile(currentDir, filename(j));
 
-            % Ki?m tra xem file 'a.wav' có t?n t?i không
+            % Ki?m tra xem file 'a.wav' c? t?n t?i kh?ng
             if exist(audioFile, 'file')
-                %fprintf('Thông tin file: %s\n', audioFile);
+                %fprintf('Th?ng tin file: %s\n', audioFile);
 
                 y = Cal_MFCC(audioFile,N_MFCC,frame_length,frame_shift);
                 result(:,i) = y;
 
             else
-                fprintf('File %s không t?n t?i.\n', audioFile);
+                fprintf('File %s kh?ng t?n t?i.\n', audioFile);
             end 
 
         end
@@ -64,20 +62,19 @@ for kk =2:5
         %dataDB = [dataDB,trungbinh(1:floor(N/2))];
         dataDB = [dataDB,transpose(x)];
 
-
     end
 
 
-    dlmwrite('data.csv', dataDB, 'delimiter', ',');  % Ghi ma tr?n vector3 vào file CSV v?i d?u ph?y làm d?u phân cách
+    dlmwrite('data.csv', dataDB, 'delimiter', ',');  % Ghi ma tr?n vector3 v?o file CSV v?i d?u ph?y l?m d?u ph?n c?ch
 
 
     % Th? m?c ch?a d? li?u
-    dataTrainDir = 'DataTest';
+    dataTrainDir = '../DataTest';
 
-    % L?y danh sách các th? m?c con c?p 1
+    % L?y danh s?ch c?c th? m?c con c?p 1
     subDirs = dir(dataTrainDir);
-    subDirs = subDirs([subDirs.isdir]);  % L?c ch? l?y các th? m?c
-    subDirs = subDirs(3:end);  % B? qua '.' và '..'
+    subDirs = subDirs([subDirs.isdir]);  % L?c ch? l?y c?c th? m?c
+    subDirs = subDirs(3:end);  % B? qua '.' v? '..'
 
 
 
@@ -92,9 +89,9 @@ for kk =2:5
 
         for j = 1:5
             audioFile = fullfile(currentDir, filename(j));
-            % Ki?m tra xem file 'a.wav' có t?n t?i không
+            % Ki?m tra xem file 'a.wav' c? t?n t?i kh?ng
             if exist(audioFile, 'file')
-                %fprintf('Thông tin file: %s\n', audioFile);
+                %fprintf('Th?ng tin file: %s\n', audioFile);
 
                 y = Cal_MFCC(audioFile,N_MFCC,frame_length,frame_shift);
                 %y = y(1:floor(length(y)/2)); % 1ay 1 nua thoi
@@ -112,7 +109,7 @@ for kk =2:5
                     end
 
                 end
-
+                results{j,position+1} = results{j,position+1} + 1;
                 confusion(position, j) = confusion(position, j) + 1;
 
                 if(j==position)   
@@ -122,23 +119,48 @@ for kk =2:5
                 total = total+1;
 
             else
-                fprintf('File %s không t?n t?i.\n', audioFile);
+                fprintf('File %s kh?ng t?n t?i.\n', audioFile);
             end 
 
         end
 
     end
-
     %disp(confusion);
-
-
-
-    fprintf('%f\n', count/total);
-
+    rates{1,kk} = count/total;
+%     fprintf('%f\n', count/total);
+    results{1,1} = 'am_a';
+    results{2,1} = 'am_e';
+    results{3,1} = 'am_i';
+    results{4,1} = 'am_o';
+    results{5,1} = 'am_u';
+    results{6,1} = 'ty_le_chung';
+    results{6,2} = count/total;
+    columnNames = {'nhan_dung_vs_nhan_dinh','am_a', 'am_e', 'am_i', 'am_o', 'am_u'};
+    resultTable = cell2table(results, 'VariableNames', columnNames);
+    excelFileName = sprintf('ConfusionMatrix_k%d.xlsx',kk); 
+    writetable(resultTable, excelFileName);
+    
 end
+columnNames = {'total','k_2', 'k_3', 'k_4', 'k_5'};
+rateTable = cell2table(rates, 'VariableNames', columnNames);
+excelFileName = sprintf('RatesBai3.xlsx');
+writetable(rateTable, excelFileName);
 
+excelFileName = sprintf('ConfusionMatrix_k3.xlsx'); 
+excel = actxserver('Excel.Application');
+excel.Workbooks.Open(fullfile(pwd, excelFileName));
+excel.Visible = true;
+sheet = excel.ActiveSheet;
 
+% In ??m ? F6 (5,6)
+highlightCell = sheet.Range('F6'); 
+highlightCell.Font.Bold = true;
 
+% In ??m ? C3 (2,3)
+highlightCell = sheet.Range('E5'); 
+highlightCell.Font.Italic = true;
 
-
-
+% L?u l?i v? ??ng file Excel
+% excel.ActiveWorkbook.Save;
+% excel.ActiveWorkbook.Close;
+% excel.Quit;

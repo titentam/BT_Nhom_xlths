@@ -25,7 +25,7 @@ for frame_length = 20:25
         %hold on;
         
         % Th? m?c ch?a d? li?u
-        dataTrainDir = 'DataTrain';
+        dataTrainDir = '../DataTrain';
 
         % L?y danh sách các th? m?c con c?p 1
         subDirs = dir(dataTrainDir);
@@ -74,7 +74,7 @@ for frame_length = 20:25
         dlmwrite('data.csv', dataDB, 'delimiter', ',');  % Ghi ma tr?n vector3 vào file CSV v?i d?u ph?y làm d?u phân cách
 
         % Th? m?c ch?a d? li?u
-        dataTrainDir = 'DataTest';
+        dataTrainDir = '../DataTest';
 
         % L?y danh sách các th? m?c con c?p 1
         subDirs = dir(dataTrainDir);

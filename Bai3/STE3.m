@@ -1,18 +1,23 @@
-function [voiceSound, fs] = MA(fileName)
+function [voiceSound, fs] = STE3(fileName)
     [sound, fs] = audioread(fileName);
     
+    sound = sound/ max(abs(sound));
+    
+    
     % Thông s? c?u hình
-    frameDuration = 0.025; % ?? dài khung (25ms)
+    frameDuration = 0.02;
     frameLength = round(frameDuration * fs); % S? m?u trong m?i khung
     
-    % Tính toán MA c?a m?i khung âm thanh
-    magnitudes = sum((abs(reshape(sound(1:frameLength * floor(length(sound) / frameLength)), frameLength, []))));
+    % Tính toán n?ng l??ng c?a m?i khung âm thanh
+    energy = sum(reshape(sound(1:frameLength * floor(length(sound) / frameLength)), frameLength, []).^2);
 
-    % Xác ??nh ng??ng MA
-    maThreshold = mean(magnitudes);
+    % Xác ??nh ng??ng n?ng l??ng
+   
+    energyThreshold = mean(energy)*0.3; %bai 3
+    %energyThreshold = mean(energy); %bai 2
 
-    % Xác ??nh các kho?ng l?ng và nguyên âm d?a trên ng??ng MA
-    isVoiced = magnitudes > maThreshold;
+    % Xác ??nh các kho?ng l?ng và nguyên âm d?a trên ng??ng n?ng l??ng
+    isVoiced = energy > energyThreshold;
 
     % L?y ph?n gi?ng nói
     voicedSound = [];

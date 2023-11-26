@@ -1,6 +1,6 @@
 function averageMFCC = Cal_MFCC(fileName, N_MFCC,frame_length,frame_shift)
     % ??c file âm thanh
-    [x, fs] = STE(fileName);
+    [x, fs] = STE3(fileName);
     x = x / max(abs(x));
 
     % Chia thành 3 ph?n và ch? l?y ph?n gi?a

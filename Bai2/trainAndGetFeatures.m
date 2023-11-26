@@ -1,6 +1,6 @@
 function trained_vectors = trainAndGetFeatures(N_FFT,frame_length,frame_shift)
     % Th? m?c ch?a d? li?u hu?n luy?n
-    dataTrainDir = 'DataTrain';
+    dataTrainDir = '../DataTrain';
 
     % L?y danh s?ch c?c th? m?c con c?p 1
     subDirs = dir(dataTrainDir);
@@ -22,8 +22,7 @@ function trained_vectors = trainAndGetFeatures(N_FFT,frame_length,frame_shift)
 
             % Ki?m tra xem file ?m thanh c? t?n t?i kh?ng
             if exist(audioFile, 'file')
-                fprintf('Th?ng tin file: %s\n', audioFile);
-
+               
                 y = feature_vector_DB(audioFile,N_FFT,frame_length,frame_shift);
                 result = result + y;
             else

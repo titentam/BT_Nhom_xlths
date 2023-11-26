@@ -83,7 +83,7 @@ for i = 1:length(subDirs)
         if exist(audioFile, 'file')
             %fprintf('Thông tin file: %s\n', audioFile);
             
-            y = Cal_MFCC(audioFile,N_MFCC);
+            y = Cal_MFCC(audioFile,N_MFCC,22,14);
             %y = y(1:floor(length(y)/2)); % 1ay 1 nua thoi
             
             minDistance = 1000000000;
